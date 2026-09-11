@@ -1,0 +1,30 @@
+services:
+  wireguard-panel:
+    build: .
+    container_name: wireguard-panel
+    restart: unless-stopped
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv6.conf.all.forwarding=1
+    ports:
+      - "5000:5000"
+      - "51820:51820/udp"
+    volumes:
+      - wg_data:/data
+      - wg_config:/etc/wireguard
+      - /lib/modules:/lib/modules:ro
+    environment:
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: change-me-now
+      SECRET_KEY: change-this-secret
+      WG_ENDPOINT: YOUR_SERVER_IP_OR_DOMAIN
+      WG_PORT: 51820
+      WG_SUBNET: 10.66.66.0/24
+      WG_DNS: 1.1.1.1
+volumes:
+  wg_data:
+  wg_config:

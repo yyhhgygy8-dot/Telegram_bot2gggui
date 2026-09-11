@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="max-width:360px;margin:60px auto 0;">
+  <h2 style="margin-top:0">ورود ادمین</h2>
+  <form method="POST">
+    <label>نام کاربری</label>
+    <input name="username" required>
+    <label>رمز عبور</label>
+    <input type="password" name="password" required>
+    <button class="btn-primary" style="margin-top:16px;width:100%">ورود</button>
+  </form>
+</div>
+{% endblock %}

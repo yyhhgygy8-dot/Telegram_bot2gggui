@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>WireGuard واقعی</h2>
+<div class="card">
+  <p><b>وضعیت:</b> {% if status.available and status.running %}فعال{% elif status.available %}ابزار نصب است ولی تونل فعال نیست{% else %}WireGuard داخل محیط اجرا در دسترس نیست{% endif %}</p>
+  <p><b>Public Key:</b> <code>{{ settings.server_public_key or '—' }}</code></p>
+  <form method="POST" action="{{ url_for('server_install') }}"><button class="btn-primary">نصب / راه‌اندازی خودکار WireGuard</button></form>
+</div>
+
+<h2>تنظیمات سرور</h2>
+<div class="card">
+<form method="POST" action="{{ url_for('settings_save') }}">
+<label>نام سرور</label><input name="server_name" value="{{ settings.server_name }}" required>
+<div class="grid2"><div><label>Endpoint عمومی</label><input name="endpoint" value="{{ settings.endpoint }}" placeholder="1.2.3.4 یا vpn.example.com" required></div><div><label>UDP Port</label><input name="listen_port" type="number" value="{{ settings.listen_port }}" required></div></div>
+<div class="grid2"><div><label>Subnet</label><input name="subnet" value="{{ settings.subnet }}" required></div><div><label>DNS</label><input name="dns" value="{{ settings.dns }}"></div></div>
+<button class="btn-primary" style="margin-top:14px">ذخیره و اعمال روی WireGuard</button>
+</form></div>
+
+<h2>ساخت Peer واقعی</h2>
+<div class="card"><form method="POST" action="{{ url_for('add_client') }}"><div class="grid2"><div><label>نام کاربر</label><input name="name" placeholder="Ali" required></div><div><label>DNS</label><input name="dns" value="{{ settings.dns }}"></div></div><div class="grid2"><div><label>Quota (GB) - 0 یعنی نامحدود</label><input name="quota_gb" type="number" min="0" value="0"></div><div><label>تاریخ و ساعت انقضا (اختیاری)</label><input name="expires_at" type="datetime-local"></div></div><button class="btn-primary" style="margin-top:14px">+ ساخت و فعال‌سازی Peer</button></form></div>
+
+<h2>کاربران</h2>
+<div class="card"><table><tr><th>نام</th><th>IP</th><th>وضعیت</th><th>Quota</th><th>انقضا</th><th>عملیات</th></tr>
+{% for c in clients %}<tr><td>{{ c.name }}</td><td>{{ c.address }}</td><td>{{ 'فعال' if c.enabled else 'خاموش' }}</td><td>{{ c.quota_gb or 'نامحدود' }}</td><td>{% if c.expires_at %}{% if c.expires_at <= now_iso %}<span class="danger">منقضی</span>{% else %}{{ c.expires_at[:16].replace('T',' ') }} UTC{% endif %}{% else %}بدون انقضا{% endif %}</td><td class="actions"><a class="pill" href="{{ url_for('conf',client_id=c.id) }}">CONF</a><a class="pill" target="_blank" href="{{ url_for('qr',client_id=c.id) }}">QR</a><form style="display:inline" method="POST" action="{{ url_for('toggle_client',client_id=c.id) }}"><button class="pill">{{ 'غیرفعال' if c.enabled else 'فعال' }}</button></form><form style="display:inline" method="POST" action="{{ url_for('renew_client',client_id=c.id) }}"><input type="hidden" name="expires_at" value="{{ c.expires_at[:19] if c.expires_at else '' }}"><button class="pill" type="button" onclick="let d=prompt('تاریخ انقضا ISO مثل 2026-12-31T23:59:59Z', this.form.expires_at.value); if(d){this.form.expires_at.value=d; this.form.submit()}">تمدید</button></form><form style="display:inline" method="POST" action="{{ url_for('delete_client',client_id=c.id) }}" onsubmit="return confirm('حذف شود؟')"><button class="btn-danger">حذف</button></form></td></tr>{% endfor %}
+{% if not clients %}<tr><td colspan="6">هنوز کاربری ساخته نشده.</td></tr>{% endif %}</table></div>
+{% endblock %}

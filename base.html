@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}پنل WireGuard{% endblock %}</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: Tahoma, Vazir, sans-serif; background:#0f172a; color:#e2e8f0; margin:0; padding:0; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-size: 20px; margin: 0 0 18px; }
+  h2 { font-size: 16px; margin: 26px 0 10px; color:#93c5fd; }
+  .card { background:#1e293b; border:1px solid #334155; border-radius:12px; padding:16px; margin-bottom:16px; }
+  label { display:block; font-size:13px; margin:10px 0 4px; color:#cbd5e1; }
+  input, select { width:100%; padding:9px 10px; border-radius:8px; border:1px solid #334155; background:#0f172a; color:#e2e8f0; font-size:14px; }
+  button { cursor:pointer; border:none; border-radius:8px; padding:9px 16px; font-size:14px; font-weight:bold; }
+  .btn-primary { background:#2563eb; color:#fff; }
+  .btn-danger { background:#7f1d1d; color:#fff; }
+  .btn-secondary { background:#334155; color:#e2e8f0; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { padding:8px 6px; border-bottom:1px solid #334155; text-align:right; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .flash { background:#78350f; color:#fde68a; padding:10px 14px; border-radius:8px; margin-bottom:14px; font-size:13px; }
+  .pill { display:inline-block; background:#0f172a; border:1px solid #334155; border-radius:999px; padding:2px 10px; font-size:11px; color:#94a3b8; }
+  a { color:#60a5fa; }
+  .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .actions button, .actions a { margin-inline-start:6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <h1>پنل ساده WireGuard</h1>
+    {% if session.get('logged_in') %}<a href="{{ url_for('logout') }}" class="pill">خروج</a>{% endif %}
+  </div>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}{% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}{% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</div>
+</body>
+</html>
+<style>.danger{font-weight:700}.actions{white-space:nowrap}</style>
